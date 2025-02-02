@@ -20,16 +20,22 @@ public class CustomerUserDetailsService implements UserDetailsService {
     @Autowired
     UserDao userDao;
 
+    private User userDetails;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("Inside loadUserByUsername {}", username);
 
-        User userDetail = userDao.findByEmailId(username);
-        if (!Objects.isNull(userDetail)) {
-            return new org.springframework.security.core.userdetails.User(userDetail.getEmail(), userDetail.getPassword(), new ArrayList<>());
+        userDetails = userDao.findByEmailId(username);
+        if (!Objects.isNull(userDetails)) {
+            return new org.springframework.security.core.userdetails.User(userDetails.getEmail(), userDetails.getPassword(), new ArrayList<>());
         } else {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
+    }
+
+    public User getUserDetails() {
+        return userDetails;
     }
 
 }
