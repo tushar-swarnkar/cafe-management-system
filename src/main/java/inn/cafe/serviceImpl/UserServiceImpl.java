@@ -18,10 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -125,5 +122,29 @@ public class UserServiceImpl implements UserService {
         }
 
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> update(Map<String, String> requestmap) {
+        log.info("Inside update {} ", requestmap);
+
+        try {
+            if (jwtFilter.isAdmin()) {
+                Optional<User> optional = userDao.findById(Integer.parseInt(requestmap.get("id")));
+
+                if (!optional.isEmpty()) {
+                    userDao.updateStatus(requestmap.get("status"), Integer.parseInt(requestmap.get("id")));
+                    return CafeUtils.getResponseEntity("Status Updated Successfully", HttpStatus.OK);
+                } else {
+                    CafeUtils.getResponseEntity("User id does not exist", HttpStatus.OK);
+                }
+            } else {
+                return CafeUtils.getResponseEntity(CafeConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
