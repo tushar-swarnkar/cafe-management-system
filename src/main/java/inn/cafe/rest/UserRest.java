@@ -25,4 +25,7 @@ public interface UserRest {
     @PostMapping("/update")
     public ResponseEntity<String> updateUser(@RequestBody(required = true) Map<String, String> requestMap);
 
+    @GetMapping("/check-token")
+    public ResponseEntity<String> checkToken();
+
 }
