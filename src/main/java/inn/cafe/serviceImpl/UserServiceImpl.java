@@ -8,6 +8,7 @@ import inn.cafe.constants.CafeConstants;
 import inn.cafe.dao.UserDao;
 import inn.cafe.service.UserService;
 import inn.cafe.utils.CafeUtils;
+import inn.cafe.utils.EmailUtils;
 import inn.cafe.wrapper.UserWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JwtFilter jwtFilter;
+
+    @Autowired
+    EmailUtils emailUtils;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -134,6 +138,9 @@ public class UserServiceImpl implements UserService {
 
                 if (!optional.isEmpty()) {
                     userDao.updateStatus(requestmap.get("status"), Integer.parseInt(requestmap.get("id")));
+
+                    sendMailToAllAdmin(requestmap.get("status"), optional.get().getEmail(), userDao.getAllAdmin());
+
                     return CafeUtils.getResponseEntity("Status Updated Successfully", HttpStatus.OK);
                 } else {
                     CafeUtils.getResponseEntity("User id does not exist", HttpStatus.OK);
@@ -147,4 +154,25 @@ public class UserServiceImpl implements UserService {
 
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    public void sendMailToAllAdmin(String status, String user, List<String> adminList) {
+        adminList.remove(jwtFilter.getCurrentUser());
+
+        if (status != null && status.equalsIgnoreCase("true")) {
+            emailUtils.sendSimpleMessage(
+                    jwtFilter.getCurrentUser(),
+                    "Account Approved",
+                    "USER: " + user + "\n is approved by \nADMIN: " + jwtFilter.getCurrentUser() + ")",
+                    adminList
+            );
+        } else {
+            emailUtils.sendSimpleMessage(
+                    jwtFilter.getCurrentUser(),
+                    "Account Disabled",
+                    "USER: " + user + "\n is disabled by \nADMIN" + jwtFilter.getCurrentUser() + ")",
+                    adminList
+            );
+        }
+    }
+
 }
