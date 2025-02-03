@@ -28,4 +28,7 @@ public interface UserRest {
     @GetMapping("/check-token")
     public ResponseEntity<String> checkToken();
 
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> requestMap);
+
 }
