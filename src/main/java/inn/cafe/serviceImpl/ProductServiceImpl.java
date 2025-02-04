@@ -172,4 +172,21 @@ public class ProductServiceImpl implements ProductService {
 
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Override
+    public ResponseEntity<ProductWrapper> getProductById(Integer id) {
+        log.info("Inside getProductById");
+
+        try {
+            Optional<Product> product = productDao.findById(id);
+            if (product.isPresent()) {
+                return new ResponseEntity<>(productDao.getProductById(id), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
