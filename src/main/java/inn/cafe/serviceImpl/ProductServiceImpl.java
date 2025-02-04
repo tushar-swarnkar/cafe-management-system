@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -90,5 +91,31 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
+        log.info("Inside updateProduct");
+
+        try {
+            if (jwtFilter.isAdmin()) {
+                if (validateProductMap(requestMap, true)) {
+                    Optional<Product> product = productDao.findById(Integer.parseInt(requestMap.get("id")));
+                    if (!product.isEmpty()) {
+                        Product prod = getProductFromMap(requestMap, true);
+                        prod.setStatus(product.get().getStatus());
+                        productDao.save(prod);
+                        return CafeUtils.getResponseEntity("Product Updated Successfully", HttpStatus.OK);
+                    }
+                    return CafeUtils.getResponseEntity("Product Not Found", HttpStatus.NOT_FOUND);
+                }
+                return CafeUtils.getResponseEntity(CafeConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
+            }
+            return CafeUtils.getResponseEntity(CafeConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
