@@ -12,6 +12,8 @@ import java.io.Serializable;
 
 @NamedQuery(name = "Product.updateProductStatus", query = "UPDATE Product p SET p.status = :status WHERE p.id = :id")
 
+@NamedQuery(name = "Product.getByCategory", query = "SELECT new inn.cafe.wrapper.ProductWrapper(p.id, p.name) FROM Product p WHERE p.category.id = :id AND p.status = 'available'")
+
 @Entity
 @Data
 @NoArgsConstructor

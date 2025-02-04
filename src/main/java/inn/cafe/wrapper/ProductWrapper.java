@@ -23,4 +23,9 @@ public class ProductWrapper {
 
     private String categoryName ;
 
+    public ProductWrapper(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
 }
