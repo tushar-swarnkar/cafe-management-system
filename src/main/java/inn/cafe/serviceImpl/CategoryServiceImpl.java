@@ -1,5 +1,6 @@
 package inn.cafe.serviceImpl;
 
+import com.google.common.base.Strings;
 import inn.cafe.JWT.JwtFilter;
 import inn.cafe.POJO.Category;
 import inn.cafe.constants.CafeConstants;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -64,5 +67,22 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(requestMap.get("name"));
 
         return category;
+    }
+
+    @Override
+    public ResponseEntity<List<Category>> getAllCategory(String categoryType) {
+        log.info("Inside getAllCategory" + categoryType);
+
+        try {
+            if (!Strings.isNullOrEmpty(categoryType) && categoryType.equalsIgnoreCase("true")) {
+                log.info("Inside categoryType provided true");
+                return new ResponseEntity<>(categoryDao.getAllCategory(), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(categoryDao.findAll(), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
