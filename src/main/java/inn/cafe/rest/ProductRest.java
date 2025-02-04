@@ -22,4 +22,7 @@ public interface ProductRest {
     @DeleteMapping("/delete/{id}")
     ResponseEntity<String> deleteProduct(@PathVariable("id") Integer id);
 
+    @PutMapping("/update-status")
+    ResponseEntity<String> updateStatus(@RequestBody Map<String, String> requestMap);
+
 }
