@@ -8,17 +8,15 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 
-@NamedQuery(name = "Category.getAllCategory", query = "SELECT c FROM Category c where c.id in (select p.category.id from Product p where p.status='true')")
-
 @Entity
 @Data
 @NoArgsConstructor
-@DynamicInsert
 @DynamicUpdate
-@Table(name = "category")
-public class Category implements Serializable {
+@DynamicInsert
+@Table(name = "product")
+public class Product implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    public static final long SerialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,5 +25,18 @@ public class Category implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_fk", nullable = false)
+    private Category category;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "price")
+    private Integer price;
+
+    @Column(name = "status")
+    private String status;
 
 }
