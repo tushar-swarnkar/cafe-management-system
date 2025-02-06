@@ -11,13 +11,14 @@ import inn.cafe.dao.BillDao;
 import inn.cafe.service.BillService;
 import inn.cafe.utils.CafeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.io.IOUtils;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -201,5 +202,42 @@ public class BillServiceImpl implements BillService {
         }
 
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<byte[]> getPDF(Map<String, Object> requestMap) {
+        log.info("Inside getPDF {}", requestMap);
+
+        try {
+            byte[] pdf = new byte[0];
+            if (requestMap.containsKey("uuid") && validateRequest(requestMap)) {
+                String filePath = CafeConstants.STORE_LOCATION + "/" + requestMap.get("uuid") + ".pdf";
+
+                if (CafeUtils.isFileExists(filePath)) {
+                    pdf = getByteArray(filePath);
+                    return new ResponseEntity<>(pdf, HttpStatus.OK);
+                } else {
+                    requestMap.put("isGenerate", false);
+                    generateReport(requestMap);
+                    pdf = getByteArray(filePath);
+                    return new ResponseEntity<>(pdf, HttpStatus.OK);
+                }
+            }
+            return new ResponseEntity<>(pdf, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<>(new byte[0], HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private byte[] getByteArray(String filePath) throws Exception {
+        File initialFile = new File(filePath);
+        InputStream targetStream = new FileInputStream(initialFile);
+
+        byte[] byteArray = IOUtils.toByteArray(targetStream);
+
+        targetStream.close();
+        return byteArray;
     }
 }
