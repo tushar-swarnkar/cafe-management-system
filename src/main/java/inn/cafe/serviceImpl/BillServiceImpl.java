@@ -240,4 +240,21 @@ public class BillServiceImpl implements BillService {
         targetStream.close();
         return byteArray;
     }
+
+    @Override
+    public ResponseEntity<String> deleteBill(Integer id) {
+        log.info("Inside deleteBill {}", id);
+
+        try {
+            if (billDao.existsById(id)) {
+                billDao.deleteById(id);
+                return CafeUtils.getResponseEntity("Bill Deleted Successfully", HttpStatus.OK);
+            }
+            return CafeUtils.getResponseEntity("Bill Not Found", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
