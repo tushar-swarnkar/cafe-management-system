@@ -4,6 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 src/test/
+bill_reports/
 
 ### STS ###
 .apt_generated
