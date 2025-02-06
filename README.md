@@ -136,4 +136,3 @@ mvn spring-boot:run
 Use **Postman** or any API testing tool to test the endpoints.
 ---
 
-Feel free to contribute and improve the project! 🚀
